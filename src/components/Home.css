@@ -1,0 +1,89 @@
+body {
+    background-color: #0d1117; /* Fondo oscuro */
+    color: #c9d1d9; /* Color de texto claro */
+    font-family: 'Arial', sans-serif; /* Fuente moderna */
+    margin: 0;
+    padding: 0;
+}
+
+h1 {
+    text-align: center;
+    margin-top: 20px;
+    color: #58a6ff; /* Título en color azul */
+}
+
+.home-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.table-container {
+    width: 80%;
+    height: 25vh; /* Mantiene la tabla en el primer cuarto de la pantalla */
+    overflow-y: auto; /* Agrega scroll vertical */
+    margin: 20px auto;
+    border: 1px solid #30363d;
+    border-radius: 8px;
+    background-color: #161b22;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+thead {
+    background-color: #21262d; /* Fondo oscuro para el encabezado */
+}
+
+th, td {
+    padding: 12px 15px;
+    text-align: center;
+}
+
+th {
+    color: #8b949e; /* Color de texto para los encabezados */
+}
+
+tbody tr {
+    background-color: #161b22; /* Fondo para cada fila */
+    border-bottom: 1px solid #30363d; /* Líneas de separación */
+}
+
+tbody tr:hover {
+    background-color: #1f6feb; /* Efecto hover */
+}
+
+img {
+    border-radius: 50%;
+}
+
+button {
+    background-color: #238636;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 10px 20px;
+    margin: 10px;
+    cursor: pointer;
+}
+
+button:disabled {
+    background-color: #484f58; /* Color para el botón deshabilitado */
+}
+
+button:hover {
+    background-color: #2ea043;
+}
+
+.pagination-controls {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 10px;
+}
+
+.pagination-controls span {
+    margin: 0 10px;
+}

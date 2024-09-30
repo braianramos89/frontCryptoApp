@@ -1,22 +1,24 @@
-// src/components/Home.js
 import React, { useEffect, useState } from 'react';
 import { useKeycloak } from '@react-keycloak/web';
-import LogoutButton from "./LogoutButton";
+import Navbar from './Navbar';
+import CryptoTable from './CryptoTable';
+import Pagination from './Pagination';
+import CryptoActions from './CryptoActions';
+import './Home.css';
 
 const Home = () => {
     const { keycloak } = useKeycloak();
     const [cryptos, setCryptos] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [selectedCrypto, setSelectedCrypto] = useState(null);
+    const itemsPerPage = 5;
 
     useEffect(() => {
-        // Verificamos si el usuario está autenticado
         if (keycloak && keycloak.authenticated) {
             const fetchCryptos = async () => {
                 try {
-                    // Actualizamos el token si es necesario
                     await keycloak.updateToken(5);
-
-                    // Realizamos la solicitud al backend
                     const response = await fetch('http://localhost:8081/api/cryptos', {
                         method: 'GET',
                         headers: {
@@ -40,50 +42,123 @@ const Home = () => {
 
             fetchCryptos();
         } else {
-            // Si el usuario no está autenticado, lo redirigimos al inicio de sesión
             keycloak.login();
         }
     }, [keycloak]);
 
+    const indexOfLastItem = currentPage * itemsPerPage;
+    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+    const currentCryptos = cryptos.slice(indexOfFirstItem, indexOfLastItem);
+
+    const nextPage = () => {
+        if (currentPage < Math.ceil(cryptos.length / itemsPerPage)) {
+            setCurrentPage(currentPage + 1);
+        }
+    };
+
+    const prevPage = () => {
+        if (currentPage > 1) {
+            setCurrentPage(currentPage - 1);
+        }
+    };
+
+    // Función para manejar la compra de una criptomoneda con cantidad específica
+    const handleBuy = async (crypto, amount) => {
+        try {
+            const response = await fetch('http://localhost:8081/api/cryptos/buy', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${keycloak.token}`,
+                },
+                body: JSON.stringify({
+                    cryptocurrencyId: crypto.id,
+                    amount: amount,
+                }),
+            });
+
+            if (response.status === 400) {
+                // Como el error es texto, lo leemos como texto
+                const errorText = await response.text();
+                if (errorText === "Saldo insuficiente") {
+                    alert(`Error: ${errorText}`);
+                    return;
+                }
+            }
+
+            if (!response.ok) {
+                throw new Error('Error al comprar la criptomoneda');
+            }
+
+            alert(`Has comprado ${amount} de ${crypto.name}`);
+        } catch (error) {
+            alert(`Error al realizar la compra: ${error.message}`);
+            console.error(error.message);
+        }
+    };
+
+    // Función para manejar la venta de una criptomoneda con cantidad específica
+    const handleSell = async (crypto, amount) => {
+        try {
+            const response = await fetch('http://localhost:8081/api/cryptos/sell', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${keycloak.token}`,
+                },
+                body: JSON.stringify({
+                    cryptocurrencyId: crypto.id,
+                    amount: amount,
+                }),
+            });
+
+            if (response.status === 400) {
+                // Como el error es texto, lo leemos como texto
+                const errorText = await response.text();
+                if (errorText === "Saldo insuficiente") {
+                    alert(`Error: ${errorText}`);
+                    return;
+                }
+            }
+
+            if (!response.ok) {
+                throw new Error('Error al vender la criptomoneda');
+            }
+
+            alert(`Has vendido ${amount} de ${crypto.name}`);
+        } catch (error) {
+            console.error(error.message);
+            alert(`Error al realizar la venta: ${error.message}`);
+        }
+    };
+
     if (loading) {
-        return <div>Cargando criptomonedas...</div>;
+        return <div className="loading">Cargando criptomonedas...</div>;
     }
 
     return (
         <div>
-            <LogoutButton />
-            <h1>Lista de Criptomonedas</h1>
-            {cryptos.length > 0 ? (
-                <table>
-                    <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Nombre</th>
-                        <th>Símbolo</th>
-                        <th>Precio Actual</th>
-                        <th>Imagen</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    {cryptos.map((crypto) => (
-                        <tr key={crypto.id}>
-                            <td>{crypto.id}</td>
-                            <td>{crypto.name}</td>
-                            <td>{crypto.symbol}</td>
-                            <td>{crypto.currentPrice}</td>
-                            <td>
-                                <img src={crypto.image} alt={crypto.name} width="50" />
-                            </td>
-                        </tr>
-                    ))}
-                    </tbody>
-                </table>
-            ) : (
-                <div>No se encontraron criptomonedas.</div>
-            )}
+            <Navbar />
+            <div className="home-container mt-8 flex flex-col items-center">
+                <h1 className="text-2xl font-bold text-center">Lista de Criptomonedas</h1>
+                <div className="w-full max-w-4xl">
+                    <CryptoTable cryptos={currentCryptos} onSelectCrypto={setSelectedCrypto} />
+                    <Pagination
+                        currentPage={currentPage}
+                        totalPages={Math.ceil(cryptos.length / itemsPerPage)}
+                        onPageChange={setCurrentPage}
+                    />
+                    {selectedCrypto && (
+                        <CryptoActions
+                            crypto={selectedCrypto}
+                            onBuy={handleBuy}
+                            onSell={handleSell}
+                        />
+                    )}
+                </div>
+            </div>
         </div>
     );
 };
 
 export default Home;
-
