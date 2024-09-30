@@ -6,6 +6,7 @@ import Home from './components/Home';
 import Dashboard from './components/Dashboard';
 import PrivateRoute from './utils/PrivateRoute';
 import './index.css';
+import Spinner from "./components/Spinner";
 
 
 
@@ -30,9 +31,12 @@ function App() {
     }, [keycloak, initialized]);
 
             if (!initialized) {
-        return <div>Cargando...</div>;
+       return (
+    <div className="flex items-center justify-center h-screen">
+        <Spinner message="Cargando pagina ..." />
+    </div>
+);
     }
-
     if (!keycloak.authenticated) {
         // Redirigir al inicio de sesión de Keycloak
         keycloak.login();

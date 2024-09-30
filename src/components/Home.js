@@ -4,6 +4,7 @@ import Navbar from './Navbar';
 import CryptoTable from './CryptoTable';
 import Pagination from './Pagination';
 import CryptoActions from './CryptoActions';
+import Spinner from './Spinner';  // Importa el nuevo componente
 import './Home.css';
 
 const Home = () => {
@@ -62,7 +63,6 @@ const Home = () => {
         }
     };
 
-    // Función para manejar la compra de una criptomoneda con cantidad específica
     const handleBuy = async (crypto, amount) => {
         try {
             const response = await fetch('http://localhost:8081/api/cryptos/buy', {
@@ -78,7 +78,6 @@ const Home = () => {
             });
 
             if (response.status === 400) {
-                // Como el error es texto, lo leemos como texto
                 const errorText = await response.text();
                 if (errorText === "Saldo insuficiente") {
                     alert(`Error: ${errorText}`);
@@ -97,7 +96,6 @@ const Home = () => {
         }
     };
 
-    // Función para manejar la venta de una criptomoneda con cantidad específica
     const handleSell = async (crypto, amount) => {
         try {
             const response = await fetch('http://localhost:8081/api/cryptos/sell', {
@@ -113,7 +111,6 @@ const Home = () => {
             });
 
             if (response.status === 400) {
-                // Como el error es texto, lo leemos como texto
                 const errorText = await response.text();
                 if (errorText === "Saldo insuficiente") {
                     alert(`Error: ${errorText}`);
@@ -133,7 +130,11 @@ const Home = () => {
     };
 
     if (loading) {
-        return <div className="loading">Cargando criptomonedas...</div>;
+        return (
+            <div className="flex items-center justify-center h-screen">
+                <Spinner message="Cargando criptomonedas..." />
+            </div>
+        );
     }
 
     return (
