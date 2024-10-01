@@ -6,9 +6,9 @@ const CryptoActions = ({ crypto, onBuy, onSell }) => {
     const [usdBalance, setUsdBalance] = useState("0");
     const [cryptoBalance, setCryptoBalance] = useState("0");
     const [amount, setAmount] = useState(0);
-    const [creditAmount, setCreditAmount] = useState(""); // Estado para el monto a cargar
+    const [creditAmount, setCreditAmount] = useState("");
     const [errorMessage, setErrorMessage] = useState("");
-    const [showCreditInput, setShowCreditInput] = useState(false); // Estado para mostrar el input de carga
+    const [showCreditInput, setShowCreditInput] = useState(false);
 
     // Función para obtener el balance en USD
     const fetchUsdBalance = async () => {
@@ -22,12 +22,10 @@ const CryptoActions = ({ crypto, onBuy, onSell }) => {
             });
 
             const data = await response.json();
-            console.log("Respuesta USD Balance Completa:", data);
 
             if (!response.ok) {
                 throw new Error('Error al obtener el balance en USD');
             }
-
             setUsdBalance(data);
         } catch (error) {
             console.error(error.message);
@@ -38,7 +36,7 @@ const CryptoActions = ({ crypto, onBuy, onSell }) => {
     // Función para obtener el balance de la criptomoneda seleccionada
     const fetchCryptoBalance = async () => {
         try {
-            const response = await fetch(`http://localhost:8081/api/balance/current/${crypto.id}`, {
+            const response = await fetch(`http://localhost:8081/api/balance/current/${crypto?.id}`, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
@@ -47,12 +45,9 @@ const CryptoActions = ({ crypto, onBuy, onSell }) => {
             });
 
             const data = await response.json();
-            console.log("Respuesta Crypto Balance Completa:", data);
-
             if (!response.ok) {
                 throw new Error('Error al obtener el balance de la criptomoneda');
             }
-
             setCryptoBalance(data);
         } catch (error) {
             console.error(error.message);
@@ -60,9 +55,9 @@ const CryptoActions = ({ crypto, onBuy, onSell }) => {
         }
     };
 
-    // Efecto que se activa cuando cambia la criptomoneda o el token
+    // UseEffect que se ejecuta cada vez que cambian `crypto` o `keycloak`
     useEffect(() => {
-        if (keycloak && keycloak.authenticated) {
+        if (keycloak && keycloak.authenticated && crypto) {
             fetchUsdBalance();
             fetchCryptoBalance();
         }
@@ -87,7 +82,7 @@ const CryptoActions = ({ crypto, onBuy, onSell }) => {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${keycloak.token}`,
                 },
-                body: JSON.stringify({ amount: parseFloat(creditAmount) }), // Pasar el monto a cargar
+                body: JSON.stringify({ amount: parseFloat(creditAmount) }),
             });
 
             if (!response.ok) {
@@ -96,7 +91,7 @@ const CryptoActions = ({ crypto, onBuy, onSell }) => {
 
             alert(`Se han cargado $${creditAmount} a tu saldo.`);
             setCreditAmount('');
-            setShowCreditInput(false); // Ocultar el input de carga tras la operación
+            setShowCreditInput(false);
 
             // Actualizar los balances después de la carga exitosa
             fetchUsdBalance();
@@ -119,17 +114,17 @@ const CryptoActions = ({ crypto, onBuy, onSell }) => {
         }
     };
 
+    if (!crypto) {
+        return <div className="text-red-500">Error: Criptomoneda no seleccionada.</div>;
+    }
+
     return (
         <div className="mt-4 p-4 border border-gray-700 rounded-lg bg-gray-800 text-white">
             <h2 className="text-lg font-bold">Opciones para {crypto.name}</h2>
             <p className="text-sm text-gray-300 mb-2">Símbolo: {crypto.symbol.toUpperCase()}</p>
-
-            {/* Mostrar el balance en USD con formato adecuado */}
             <p className="text-sm text-gray-300 mb-2">
                 Balance en USD: {usdBalance !== null && usdBalance !== undefined ? `$${usdBalance}` : "N/A"}
             </p>
-
-            {/* Mostrar el balance de la criptomoneda con formato adecuado */}
             <p className="text-sm text-gray-300 mb-4">
                 Balance en {crypto.symbol.toUpperCase()}: {cryptoBalance !== null && cryptoBalance !== undefined ? `${cryptoBalance}` : "N/A"}
             </p>
@@ -147,7 +142,6 @@ const CryptoActions = ({ crypto, onBuy, onSell }) => {
                 />
             </div>
 
-            {/* Botón para desplegar el input de carga de saldo */}
             {!showCreditInput && (
                 <button
                     onClick={() => setShowCreditInput(true)}
@@ -157,7 +151,6 @@ const CryptoActions = ({ crypto, onBuy, onSell }) => {
                 </button>
             )}
 
-            {/* Input y botón de confirmación para cargar saldo */}
             {showCreditInput && (
                 <div className="mb-4">
                     <label className="block text-sm text-gray-400 mb-2">Monto a Cargar:</label>
