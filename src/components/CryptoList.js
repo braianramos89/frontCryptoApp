@@ -6,7 +6,7 @@ import Spinner from "./Spinner";
 import DatePicker from 'react-datepicker';
 import "react-datepicker/dist/react-datepicker.css"; // Importar estilos de DatePicker
 
-const CryptoList = () => {
+const CryptoList = ({ searchTerm, onSelectCrypto }) => {
     const [cryptos, setCryptos] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -14,6 +14,7 @@ const CryptoList = () => {
     const [selectedCrypto, setSelectedCrypto] = useState(null); // Criptomoneda seleccionada
     const [startDate, setStartDate] = useState(new Date()); // Fecha de inicio para DatePicker
     const [endDate, setEndDate] = useState(new Date()); // Fecha de fin para DatePicker
+    const [prediction, setPrediction] = useState(null); // Estado para la predicción de la tendencia
     const itemsPerPage = 9; // Mostrar 9 elementos por página
     const { keycloak, initialized } = useKeycloak();
 
@@ -53,12 +54,6 @@ const CryptoList = () => {
         fetchCryptos();
     }, [keycloak, initialized]);
 
-    const indexOfLastItem = currentPage * itemsPerPage;
-    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-    const currentCryptos = cryptos.slice(indexOfFirstItem, indexOfLastItem);
-
-
-
     const formatNumber = (num) => {
         return new Intl.NumberFormat('es-ES', {
             style: 'currency',
@@ -78,6 +73,7 @@ const CryptoList = () => {
 
     const handleSelect = (crypto) => {
         setSelectedCrypto(crypto); // Marcar la criptomoneda seleccionada
+        setPrediction(null); // Reiniciar la predicción al cambiar de criptomoneda
     };
 
     const handlePredict = () => {
@@ -94,12 +90,39 @@ const CryptoList = () => {
             })
                 .then(response => response.text())
                 .then(data => {
-                    alert(`Resultado de predicción para ${selectedCrypto.name}: ${data}`);
+                    setPrediction(data); // Almacenar la predicción en el estado
                 })
                 .catch(error => {
                     console.error('Error al predecir la tendencia:', error);
                     alert(`Error al predecir la tendencia: ${error.message}`);
                 });
+        }
+    };
+
+    const getPredictionColor = (prediction) => {
+        if (prediction.includes("Señal de venta")) return "bg-red-500";
+        if (prediction.includes("Señal de compra")) return "bg-green-500";
+        return "bg-blue-500";
+    };
+
+    const filteredCryptos = cryptos.filter((crypto) =>
+        crypto.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        crypto.symbol.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
+    const indexOfLastItem = currentPage * itemsPerPage;
+    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+    const currentCryptos = filteredCryptos.slice(indexOfFirstItem, indexOfLastItem);
+
+    const nextPage = () => {
+        if (currentPage < Math.ceil(filteredCryptos.length / itemsPerPage)) {
+            setCurrentPage(currentPage + 1);
+        }
+    };
+
+    const prevPage = () => {
+        if (currentPage > 1) {
+            setCurrentPage(currentPage - 1);
         }
     };
 
@@ -145,7 +168,7 @@ const CryptoList = () => {
             </div>
 
             {/* Componente de paginación */}
-            <div className="flex justify-center mt-4">
+            <div className="flex justify-center mt-4 mb-2">
                 <Pagination
                     currentPage={currentPage}
                     totalPages={Math.ceil(cryptos.length / itemsPerPage)}
@@ -155,7 +178,7 @@ const CryptoList = () => {
 
             {/* Mostrar DatePicker cuando se seleccione una criptomoneda */}
             {selectedCrypto && (
-                <div className="mt-8 p-4 bg-gray-800 rounded-lg text-white">
+                <div className="p-4 bg-gray-800 rounded-lg text-white mb-4">
                     <h2 className="text-lg font-bold">Predicción de tendencia para {selectedCrypto.name}</h2>
                     <div className="flex items-center space-x-4 mt-4">
                         <DatePicker
@@ -177,8 +200,20 @@ const CryptoList = () => {
                             onClick={handlePredict}
                             className="ml-4 bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600"
                         >
-                            Predecir Tendencia
+                            Predecir Tendencias Futuras
                         </button>
+
+                        {prediction && (
+                            <input
+                                type="text"
+                                readOnly
+                                value={prediction}
+                                className={`ml-4 text-center text-white px-4 py-2 rounded-md w-auto ${getPredictionColor(prediction)}`}
+                                style={{ minWidth: `${prediction.length * 8}px` }} // Ajuste basado en la longitud del texto
+                            />
+                        )}
+
+
                     </div>
                 </div>
             )}
