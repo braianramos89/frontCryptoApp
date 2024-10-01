@@ -94,14 +94,34 @@ const CryptoActions = ({ crypto, onBuy, onSell }) => {
             setShowCreditInput(false);
 
             // Actualizar los balances después de la carga exitosa
-            fetchUsdBalance();
+            await fetchUsdBalance();
+
         } catch (error) {
             alert(`Error al cargar el saldo: ${error.message}`);
             console.error(error.message);
         }
     };
 
-    const handleSell = () => {
+    // Función para manejar la compra de criptomonedas
+    const handleBuy = async () => {
+        try {
+            if (amount <= 0) {
+                setErrorMessage("La cantidad debe ser mayor a 0");
+                return;
+            }
+
+            await onBuy(crypto, amount);
+
+            // Actualizar los balances después de la compra exitosa
+            await fetchUsdBalance();
+            await fetchCryptoBalance();
+        } catch (error) {
+            setErrorMessage("Error al comprar la criptomoneda");
+        }
+    };
+
+    // Función para manejar la venta de criptomonedas
+    const handleSell = async () => {
         if (amount <= 0) {
             setErrorMessage("La cantidad debe ser mayor a 0");
             return;
@@ -110,7 +130,11 @@ const CryptoActions = ({ crypto, onBuy, onSell }) => {
             setErrorMessage(`No tienes suficiente ${crypto.name} para vender.`);
         } else {
             setErrorMessage("");
-            onSell(crypto, amount);
+            await onSell(crypto, amount);
+
+            // Actualizar los balances después de la venta exitosa
+            await fetchUsdBalance();
+            await fetchCryptoBalance();
         }
     };
 
@@ -173,7 +197,7 @@ const CryptoActions = ({ crypto, onBuy, onSell }) => {
             <div className="flex justify-around">
                 <button
                     className="px-4 py-2 bg-green-600 hover:bg-green-700 rounded-md"
-                    onClick={() => onBuy(crypto, amount)}
+                    onClick={handleBuy}
                     disabled={amount <= 0}
                 >
                     Comprar
