@@ -1,10 +1,10 @@
-// src/App.js
 import React, { useEffect } from 'react';
 import { useKeycloak } from '@react-keycloak/web';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import Home from './components/Home';
 import Dashboard from './components/Dashboard';
 import CryptoPage from './components/CryptoPage'; // Importar CryptoPage
+import UserManagement from './components/UserManagement'; // Importar UserManagement
 import PrivateRoute from './utils/PrivateRoute';
 import './index.css';
 import Spinner from "./components/Spinner";
@@ -16,13 +16,13 @@ function App() {
         if (initialized && keycloak.authenticated) {
             const refreshToken = () => {
                 keycloak
-                    .updateToken(5) // Renueva el token si faltan menos de 5 segundos para expirar
+                    .updateToken(5)
                     .catch(() => {
                         keycloak.logout();
                     });
             };
 
-            const tokenRefreshInterval = setInterval(refreshToken, 60000); // Verifica cada minuto
+            const tokenRefreshInterval = setInterval(refreshToken, 60000);
             return () => {
                 clearInterval(tokenRefreshInterval);
             };
@@ -54,12 +54,20 @@ function App() {
                         </PrivateRoute>
                     }
                 />
-                {/* Nueva ruta para CryptoPage */}
                 <Route
                     path="/cryptotarjetas"
                     element={
                         <PrivateRoute>
                             <CryptoPage />
+                        </PrivateRoute>
+                    }
+                />
+                {/* Nueva ruta para la gestión de usuarios */}
+                <Route
+                    path="/user-management"
+                    element={
+                        <PrivateRoute roles={['admin_client_role']}>
+                            <UserManagement />
                         </PrivateRoute>
                     }
                 />
