@@ -21,7 +21,7 @@ const UserManagement = () => {
     // Función para obtener todos los usuarios
     const fetchUsers = async () => {
         try {
-            const response = await fetch('http://localhost:8081/keycloak/users', {
+            const response = await fetch('http://localhost:8081/api/v1/keycloak/users', {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
@@ -105,7 +105,7 @@ const UserManagement = () => {
     // Función para crear un nuevo usuario
     const handleCreateUser = async () => {
         try {
-            const response = await fetch('http://localhost:8081/keycloak/users', {
+            const response = await fetch('http://localhost:8081/api/v1/keycloak/users', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -130,7 +130,7 @@ const UserManagement = () => {
     // Función para actualizar un usuario existente
     const handleEditUser = async () => {
         try {
-            const response = await fetch(`http://localhost:8081/keycloak/users/${editingUser.id}`, {
+            const response = await fetch(`http://localhost:8081/api/v1/keycloak/users/${editingUser.id}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -159,7 +159,7 @@ const UserManagement = () => {
         if (!confirmDelete) return;
 
         try {
-            const response = await fetch(`http://localhost:8081/keycloak/users/${userId}`, {
+            const response = await fetch(`http://localhost:8081/api/v1/keycloak/users/${userId}`, {
                 method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json',
