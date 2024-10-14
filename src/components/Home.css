@@ -87,3 +87,9 @@ button:hover {
 .pagination-controls span {
     margin: 0 10px;
 }
+
+.transaction-container {
+    background-color: #0d1117;
+}
+
+

@@ -8,6 +8,7 @@ import UserManagement from './components/UserManagement'; // Importar UserManage
 import PrivateRoute from './utils/PrivateRoute';
 import './index.css';
 import Spinner from "./components/Spinner";
+import Transaction from "./components/Transaction";
 
 function App() {
     const { keycloak, initialized } = useKeycloak();
@@ -68,6 +69,15 @@ function App() {
                     element={
                         <PrivateRoute roles={['admin_client_role']}>
                             <UserManagement />
+                        </PrivateRoute>
+                    }
+                />
+
+            <Route
+                    path="/admin/transactions"
+                    element={
+                        <PrivateRoute roles={['admin_client_role']}>
+                            <Transaction />
                         </PrivateRoute>
                     }
                 />

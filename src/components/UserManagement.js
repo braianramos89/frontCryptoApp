@@ -179,12 +179,15 @@ const UserManagement = () => {
         }
     };
 
-    if (loading) return <Spinner message="Cargando usuarios..." />;
+    if (loading) return <div className="flex items-center justify-center h-screen">
+        <Spinner message="Cargando usuarios..."/>
+    </div>
+    ;
     if (error) return <div className="text-center text-red-500">{error}</div>;
 
     return (
         <div>
-            <Navbar />
+            <Navbar/>
             <div className="container mx-auto mt-8 p-4">
                 <h1 className="text-3xl font-bold mb-4 text-white">Gestión de Usuarios</h1>
 
