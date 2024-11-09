@@ -123,12 +123,16 @@ const Transaction = () => {
     const currentTransactions = filteredTransactions.slice(indexOfFirstItem, indexOfLastItem);
 
     if (loading) {
-        return <Spinner message="Cargando transacciones..." />;
+        return <div className="flex items-center justify-center h-screen">
+            <Spinner message="Cargando Transacciones..."/>
+        </div>;
     }
+
+
 
     return (
         <div className="transaction-container min-h-screen">
-            <Navbar />
+            <Navbar/>
             <div className="container mx-auto py-4 px-6 justify-center">
 
                 <h1 className="text-2xl font-bold text-blue-500">Transacciones</h1>

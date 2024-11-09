@@ -8,17 +8,14 @@ const UserManagement = () => {
     const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const [searchTerm, setSearchTerm] = useState(""); // Estado para la búsqueda
-    const [showForm, setShowForm] = useState(false); // Muestra el formulario de creación/edición
-    const [editingUser, setEditingUser] = useState(null); // Usuario en edición
+    const [searchTerm, setSearchTerm] = useState("");
+    const [showForm, setShowForm] = useState(false);
+    const [editingUser, setEditingUser] = useState(null);
     const [formData, setFormData] = useState({ username: "", email: "", password: "" });
-    const [currentPage, setCurrentPage] = useState(1); // Página actual
-    const itemsPerPage = 5; // Mostrar 7 usuarios por página
-
-    // Referencia para el formulario
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 5;
     const formRef = useRef(null);
 
-    // Función para obtener todos los usuarios
     const fetchUsers = async () => {
         try {
             const response = await fetch('http://localhost:8081/api/v1/keycloak/users', {
@@ -46,22 +43,17 @@ const UserManagement = () => {
         fetchUsers();
     }, [keycloak]);
 
-    // Filtrar los usuarios según el término de búsqueda
     const filteredUsers = users.filter(
         (user) =>
             user.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
             user.email.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
-    // Calcular el número total de páginas
     const totalPages = Math.ceil(filteredUsers.length / itemsPerPage);
-
-    // Obtener usuarios de la página actual
     const indexOfLastUser = currentPage * itemsPerPage;
     const indexOfFirstUser = indexOfLastUser - itemsPerPage;
     const currentUsers = filteredUsers.slice(indexOfFirstUser, indexOfLastUser);
 
-    // Funciones para cambiar de página
     const nextPage = () => {
         if (currentPage < totalPages) {
             setCurrentPage(currentPage + 1);
@@ -74,7 +66,6 @@ const UserManagement = () => {
         }
     };
 
-    // Manejar cambios en el formulario
     const handleChange = (e) => {
         setFormData({
             ...formData,
@@ -82,27 +73,24 @@ const UserManagement = () => {
         });
     };
 
-    // Función para mostrar el formulario de creación de un nuevo usuario y desplazar hacia el formulario
     const handleCreateClick = () => {
         setShowForm(true);
         setEditingUser(null);
-        setFormData({ username: "", email: "", password: "" }); // Limpiar el formulario
-        setTimeout(() => {
-            formRef.current?.scrollIntoView({ behavior: 'smooth' });
-        }, 100); // Pequeño retraso para asegurar que se muestre el formulario antes del scroll
-    };
-
-    // Función para iniciar la edición de un usuario existente y desplazar hacia el formulario
-    const handleEditClick = (user) => {
-        setShowForm(true);
-        setEditingUser(user);
-        setFormData({ username: user.username, email: user.email, password: "" }); // Cargar los datos del usuario
+        setFormData({ username: "", email: "", password: "" });
         setTimeout(() => {
             formRef.current?.scrollIntoView({ behavior: 'smooth' });
         }, 100);
     };
 
-    // Función para crear un nuevo usuario
+    const handleEditClick = (user) => {
+        setShowForm(true);
+        setEditingUser(user);
+        setFormData({ username: user.username, email: user.email, password: "" });
+        setTimeout(() => {
+            formRef.current?.scrollIntoView({ behavior: 'smooth' });
+        }, 100);
+    };
+
     const handleCreateUser = async () => {
         try {
             const response = await fetch('http://localhost:8081/api/v1/keycloak/users', {
@@ -119,15 +107,14 @@ const UserManagement = () => {
             }
 
             alert("Usuario creado con éxito");
-            fetchUsers(); // Refrescar la lista de usuarios
-            setShowForm(false); // Cerrar el formulario
+            fetchUsers();
+            setShowForm(false);
         } catch (error) {
             console.error("Error al crear usuario:", error);
             alert(`Error al crear usuario: ${error.message}`);
         }
     };
 
-    // Función para actualizar un usuario existente
     const handleEditUser = async () => {
         try {
             const response = await fetch(`http://localhost:8081/api/v1/keycloak/users/${editingUser.id}`, {
@@ -144,16 +131,15 @@ const UserManagement = () => {
             }
 
             alert("Usuario actualizado con éxito");
-            fetchUsers(); // Refrescar la lista de usuarios
-            setShowForm(false); // Cerrar el formulario
-            setEditingUser(null); // Limpiar el estado de edición
+            fetchUsers();
+            setShowForm(false);
+            setEditingUser(null);
         } catch (error) {
             console.error("Error al actualizar usuario:", error);
             alert(`Error al actualizar usuario: ${error.message}`);
         }
     };
 
-    // Función para eliminar un usuario
     const handleDeleteUser = async (userId) => {
         const confirmDelete = window.confirm("¿Estás seguro de que deseas eliminar este usuario?");
         if (!confirmDelete) return;
@@ -172,143 +158,107 @@ const UserManagement = () => {
             }
 
             alert("Usuario eliminado con éxito");
-            fetchUsers(); // Refrescar la lista de usuarios
+            fetchUsers();
         } catch (error) {
             console.error("Error al eliminar usuario:", error);
             alert(`Error al eliminar usuario: ${error.message}`);
         }
     };
 
-    if (loading) return <div className="flex items-center justify-center h-screen">
-        <Spinner message="Cargando usuarios..."/>
-    </div>
-    ;
-    if (error) return <div className="text-center text-red-500">{error}</div>;
-
     return (
         <div>
-            <Navbar/>
+            <Navbar /> {/* La Navbar siempre se muestra */}
+
             <div className="container mx-auto mt-8 p-4">
-                <h1 className="text-3xl font-bold mb-4 text-white">Gestión de Usuarios</h1>
+                {loading && (
+                    <div className="flex items-center justify-center h-screen">
+                        <Spinner message="Cargando usuarios..." />
+                    </div>
+                )}
 
-                {/* Barra de búsqueda */}
-                <div className="mb-4">
-                    <input
-                        type="text"
-                        placeholder="Buscar por nombre de usuario o correo electrónico..."
-                        className="w-full px-4 py-2 bg-gray-800 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)} // Actualiza el término de búsqueda
-                    />
-                </div>
+                {!loading && error && (
+                    <div className="flex items-center justify-center h-screen">
+                        <img src="/404.png" alt="Error" />
+                    </div>
+                )}
 
-                {/* Botón para crear un nuevo usuario */}
-                <div className="mb-4">
-                    <button
-                        className="bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded"
-                        onClick={handleCreateClick}
-                    >
-                        Crear Usuario
-                    </button>
-                </div>
+                {!loading && !error && (
+                    <>
+                        <h1 className="text-3xl font-bold mb-4 text-white">Gestión de Usuarios</h1>
 
-                {/* Tabla de usuarios filtrados */}
-                <div className="overflow-x-auto">
-                    <table className="min-w-full bg-gray-800 rounded-lg text-white">
-                        <thead>
-                        <tr>
-                            <th className="px-4 py-2">ID</th>
-                            <th className="px-4 py-2">Nombre de Usuario</th>
-                            <th className="px-4 py-2">Email</th>
-                            <th className="px-4 py-2">Acciones</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        {currentUsers.map((user) => (
-                            <tr key={user.id} className="bg-gray-700 hover:bg-gray-600">
-                                <td className="px-4 py-2">{user.id}</td>
-                                <td className="px-4 py-2">{user.username}</td>
-                                <td className="px-4 py-2">{user.email}</td>
-                                <td className="px-4 py-2 flex space-x-2">
-                                    <button
-                                        className="bg-yellow-500 hover:bg-yellow-600 text-white py-1 px-2 rounded"
-                                        onClick={() => handleEditClick(user)}
-                                    >
-                                        Editar
-                                    </button>
-                                    <button
-                                        className="bg-red-500 hover:bg-red-600 text-white py-1 px-2 rounded"
-                                        onClick={() => handleDeleteUser(user.id)}
-                                    >
-                                        Eliminar
-                                    </button>
-                                </td>
-                            </tr>
-                        ))}
-                        </tbody>
-                    </table>
-                </div>
-
-                {/* Paginación */}
-                <div className="mt-4 flex items-center justify-center space-x-4">
-                    <button
-                        onClick={prevPage}
-                        disabled={currentPage === 1}
-                        className="bg-gray-500 text-white py-2 px-4 rounded disabled:opacity-50"
-                    >
-                        Anterior
-                    </button>
-                    <span className="text-white">Página {currentPage} de {totalPages}</span>
-                    <button
-                        onClick={nextPage}
-                        disabled={currentPage === totalPages}
-                        className="bg-gray-500 text-white py-2 px-4 rounded disabled:opacity-50"
-                    >
-                        Siguiente
-                    </button>
-                </div>
-
-                {/* Formulario para crear/editar usuarios */}
-                {showForm && (
-                    <div ref={formRef} className="mt-8 p-4 bg-gray-800 rounded-lg text-white">
-                        <h2 className="text-lg font-bold mb-4">{editingUser ? "Editar Usuario" : "Crear Usuario"}</h2>
                         <div className="mb-4">
-                            <label className="block text-sm mb-2">Nombre de Usuario</label>
                             <input
                                 type="text"
-                                name="username"
-                                value={formData.username}
-                                onChange={handleChange}
-                                className="w-full px-4 py-2 bg-gray-900 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                                placeholder="Buscar por nombre de usuario o correo electrónico..."
+                                className="w-full px-4 py-2 bg-gray-800 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
                             />
                         </div>
+
                         <div className="mb-4">
-                            <label className="block text-sm mb-2">Correo Electrónico</label>
-                            <input
-                                type="email"
-                                name="email"
-                                value={formData.email}
-                                onChange={handleChange}
-                                className="w-full px-4 py-2 bg-gray-900 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                            />
+                            <button
+                                className="bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded"
+                                onClick={handleCreateClick}
+                            >
+                                Crear Usuario
+                            </button>
                         </div>
-                        <div className="mb-4">
-                            <label className="block text-sm mb-2">Contraseña</label>
-                            <input
-                                type="password"
-                                name="password"
-                                value={formData.password}
-                                onChange={handleChange}
-                                className="w-full px-4 py-2 bg-gray-900 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                            />
+
+                        <div className="overflow-x-auto">
+                            <table className="min-w-full bg-gray-800 rounded-lg text-white">
+                                <thead>
+                                <tr>
+                                    <th className="px-4 py-2">ID</th>
+                                    <th className="px-4 py-2">Nombre de Usuario</th>
+                                    <th className="px-4 py-2">Email</th>
+                                    <th className="px-4 py-2">Acciones</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {currentUsers.map((user) => (
+                                    <tr key={user.id} className="bg-gray-700 hover:bg-gray-600">
+                                        <td className="px-4 py-2">{user.id}</td>
+                                        <td className="px-4 py-2">{user.username}</td>
+                                        <td className="px-4 py-2">{user.email}</td>
+                                        <td className="px-4 py-2 flex space-x-2">
+                                            <button
+                                                className="bg-yellow-500 hover:bg-yellow-600 text-white py-1 px-2 rounded"
+                                                onClick={() => handleEditClick(user)}
+                                            >
+                                                Editar
+                                            </button>
+                                            <button
+                                                className="bg-red-500 hover:bg-red-600 text-white py-1 px-2 rounded"
+                                                onClick={() => handleDeleteUser(user.id)}
+                                            >
+                                                Eliminar
+                                            </button>
+                                        </td>
+                                    </tr>
+                                ))}
+                                </tbody>
+                            </table>
                         </div>
-                        <button
-                            onClick={editingUser ? handleEditUser : handleCreateUser}
-                            className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded"
-                        >
-                            {editingUser ? "Actualizar Usuario" : "Crear Usuario"}
-                        </button>
-                    </div>
+
+                        <div className="mt-4 flex items-center justify-center space-x-4">
+                            <button
+                                onClick={prevPage}
+                                disabled={currentPage === 1}
+                                className="bg-gray-500 text-white py-2 px-4 rounded disabled:opacity-50"
+                            >
+                                Anterior
+                            </button>
+                            <span className="text-white">Página {currentPage} de {totalPages}</span>
+                            <button
+                                onClick={nextPage}
+                                disabled={currentPage === totalPages}
+                                className="bg-gray-500 text-white py-2 px-4 rounded disabled:opacity-50"
+                            >
+                                Siguiente
+                            </button>
+                        </div>
+                    </>
                 )}
             </div>
         </div>

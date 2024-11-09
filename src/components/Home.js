@@ -15,6 +15,7 @@ const Home = () => {
     const [selectedCrypto, setSelectedCrypto] = useState(null);
     const [searchTerm, setSearchTerm] = useState(''); // Estado para la búsqueda
     const itemsPerPage = 5;
+    const [error, setError] = useState(false);
 
     useEffect(() => {
         if (keycloak && keycloak.authenticated) {
@@ -39,6 +40,7 @@ const Home = () => {
                 } catch (error) {
                     console.error('Error al obtener las criptomonedas:', error);
                     setLoading(false);
+                    setError(true);
                 }
             };
 
@@ -134,6 +136,8 @@ const Home = () => {
             </div>
         );
     }
+
+
 
     return (
         <div>

@@ -129,7 +129,13 @@ const CryptoList = ({ searchTerm, onSelectCrypto }) => {
     if (!initialized) return <div className="text-center">Inicializando Keycloak...</div>;
     if (!keycloak.authenticated) return <div className="text-center">Por favor, inicia sesión para ver las criptomonedas.</div>;
     if (loading) return <div className="text-center"><Spinner message="Cargando..." /> </div>;
-    if (error) return <div className="text-center text-red-500">{error}</div>;
+    if (error) {
+        return (
+            <div className="flex items-center justify-center h-screen">
+                <img src="/404.png" alt="Error" />
+            </div>
+        );
+    }
 
     return (
         <div className="container mx-auto p-4">
