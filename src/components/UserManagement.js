@@ -165,100 +165,139 @@ const UserManagement = () => {
         }
     };
 
+    if (loading) return (
+        <div className="flex items-center justify-center h-screen">
+            <Spinner message="Cargando usuarios..." />
+        </div>
+    );
+
+    if (error) {
+        return (
+            <div className="flex items-center justify-center h-screen">
+                <img src="/404.png" alt="Error" />
+            </div>
+        );
+    }
+
     return (
         <div>
-            <Navbar /> {/* La Navbar siempre se muestra */}
-
+            <Navbar />
             <div className="container mx-auto mt-8 p-4">
-                {loading && (
-                    <div className="flex items-center justify-center h-screen">
-                        <Spinner message="Cargando usuarios..." />
-                    </div>
-                )}
+                <h1 className="text-3xl font-bold mb-4 text-white">Gestión de Usuarios</h1>
 
-                {!loading && error && (
-                    <div className="flex items-center justify-center h-screen">
-                        <img src="/404.png" alt="Error" />
-                    </div>
-                )}
+                <div className="mb-4">
+                    <input
+                        type="text"
+                        placeholder="Buscar por nombre de usuario o correo electrónico..."
+                        className="w-full px-4 py-2 bg-gray-800 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                    />
+                </div>
 
-                {!loading && !error && (
-                    <>
-                        <h1 className="text-3xl font-bold mb-4 text-white">Gestión de Usuarios</h1>
+                <div className="mb-4">
+                    <button
+                        className="bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded"
+                        onClick={handleCreateClick}
+                    >
+                        Crear Usuario
+                    </button>
+                </div>
 
+                <div className="overflow-x-auto">
+                    <table className="min-w-full bg-gray-800 rounded-lg text-white">
+                        <thead>
+                        <tr>
+                            <th className="px-4 py-2">ID</th>
+                            <th className="px-4 py-2">Nombre de Usuario</th>
+                            <th className="px-4 py-2">Email</th>
+                            <th className="px-4 py-2">Acciones</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {currentUsers.map((user) => (
+                            <tr key={user.id} className="bg-gray-700 hover:bg-gray-600">
+                                <td className="px-4 py-2">{user.id}</td>
+                                <td className="px-4 py-2">{user.username}</td>
+                                <td className="px-4 py-2">{user.email}</td>
+                                <td className="px-4 py-2 flex space-x-2">
+                                    <button
+                                        className="bg-yellow-500 hover:bg-yellow-600 text-white py-1 px-2 rounded"
+                                        onClick={() => handleEditClick(user)}
+                                    >
+                                        Editar
+                                    </button>
+                                    <button
+                                        className="bg-red-500 hover:bg-red-600 text-white py-1 px-2 rounded"
+                                        onClick={() => handleDeleteUser(user.id)}
+                                    >
+                                        Eliminar
+                                    </button>
+                                </td>
+                            </tr>
+                        ))}
+                        </tbody>
+                    </table>
+                </div>
+
+                <div className="mt-4 flex items-center justify-center space-x-4">
+                    <button
+                        onClick={prevPage}
+                        disabled={currentPage === 1}
+                        className="bg-gray-500 text-white py-2 px-4 rounded disabled:opacity-50"
+                    >
+                        Anterior
+                    </button>
+                    <span className="text-white">Página {currentPage} de {totalPages}</span>
+                    <button
+                        onClick={nextPage}
+                        disabled={currentPage === totalPages}
+                        className="bg-gray-500 text-white py-2 px-4 rounded disabled:opacity-50"
+                    >
+                        Siguiente
+                    </button>
+                </div>
+
+                {showForm && (
+                    <div ref={formRef} className="mt-8 p-4 bg-gray-800 rounded-lg text-white">
+                        <h2 className="text-lg font-bold mb-4">{editingUser ? "Editar Usuario" : "Crear Usuario"}</h2>
                         <div className="mb-4">
+                            <label className="block text-sm mb-2">Nombre de Usuario</label>
                             <input
                                 type="text"
-                                placeholder="Buscar por nombre de usuario o correo electrónico..."
-                                className="w-full px-4 py-2 bg-gray-800 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                                value={searchTerm}
-                                onChange={(e) => setSearchTerm(e.target.value)}
+                                name="username"
+                                value={formData.username}
+                                onChange={handleChange}
+                                className="w-full px-4 py-2 bg-gray-900 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
                             />
                         </div>
-
                         <div className="mb-4">
-                            <button
-                                className="bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded"
-                                onClick={handleCreateClick}
-                            >
-                                Crear Usuario
-                            </button>
+                            <label className="block text-sm mb-2">Correo Electrónico</label>
+                            <input
+                                type="email"
+                                name="email"
+                                value={formData.email}
+                                onChange={handleChange}
+                                className="w-full px-4 py-2 bg-gray-900 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                            />
                         </div>
-
-                        <div className="overflow-x-auto">
-                            <table className="min-w-full bg-gray-800 rounded-lg text-white">
-                                <thead>
-                                <tr>
-                                    <th className="px-4 py-2">ID</th>
-                                    <th className="px-4 py-2">Nombre de Usuario</th>
-                                    <th className="px-4 py-2">Email</th>
-                                    <th className="px-4 py-2">Acciones</th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                {currentUsers.map((user) => (
-                                    <tr key={user.id} className="bg-gray-700 hover:bg-gray-600">
-                                        <td className="px-4 py-2">{user.id}</td>
-                                        <td className="px-4 py-2">{user.username}</td>
-                                        <td className="px-4 py-2">{user.email}</td>
-                                        <td className="px-4 py-2 flex space-x-2">
-                                            <button
-                                                className="bg-yellow-500 hover:bg-yellow-600 text-white py-1 px-2 rounded"
-                                                onClick={() => handleEditClick(user)}
-                                            >
-                                                Editar
-                                            </button>
-                                            <button
-                                                className="bg-red-500 hover:bg-red-600 text-white py-1 px-2 rounded"
-                                                onClick={() => handleDeleteUser(user.id)}
-                                            >
-                                                Eliminar
-                                            </button>
-                                        </td>
-                                    </tr>
-                                ))}
-                                </tbody>
-                            </table>
+                        <div className="mb-4">
+                            <label className="block text-sm mb-2">Contraseña</label>
+                            <input
+                                type="password"
+                                name="password"
+                                value={formData.password}
+                                onChange={handleChange}
+                                className="w-full px-4 py-2 bg-gray-900 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                            />
                         </div>
-
-                        <div className="mt-4 flex items-center justify-center space-x-4">
-                            <button
-                                onClick={prevPage}
-                                disabled={currentPage === 1}
-                                className="bg-gray-500 text-white py-2 px-4 rounded disabled:opacity-50"
-                            >
-                                Anterior
-                            </button>
-                            <span className="text-white">Página {currentPage} de {totalPages}</span>
-                            <button
-                                onClick={nextPage}
-                                disabled={currentPage === totalPages}
-                                className="bg-gray-500 text-white py-2 px-4 rounded disabled:opacity-50"
-                            >
-                                Siguiente
-                            </button>
-                        </div>
-                    </>
+                        <button
+                            onClick={editingUser ? handleEditUser : handleCreateUser}
+                            className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded"
+                        >
+                            {editingUser ? "Actualizar Usuario" : "Crear Usuario"}
+                        </button>
+                    </div>
                 )}
             </div>
         </div>
