@@ -34,10 +34,12 @@ jobs:
           cat ${{ env.TAG_FILE }}
         shell: bash
 
-      - name: Run tests
+      - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
           node-version: '14'
+
+      - name: Run tests
         run: |
           npm install
           npm test
