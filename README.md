@@ -61,6 +61,3 @@ CryptoApp es una aplicación basada en React que permite a los usuarios ver, com
 5. Empuja a la rama (`git push origin feature-branch`).
 6. Abre un pull request.
 
-## Licencia
-
-Este proyecto está licenciado bajo la Licencia MIT.

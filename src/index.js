@@ -10,7 +10,7 @@ root.render(
     <ReactKeycloakProvider
         authClient={keycloak}
         initOptions={{
-            onLoad: 'login-required', // Asegúrate de que esto está presente
+            onLoad: 'login-required', // Indica que el usuario debe iniciar sesión antes de cargar la aplicación
             checkLoginIframe: false,
         }}
     >

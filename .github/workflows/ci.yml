@@ -1,0 +1,60 @@
+name: CI for Frontend
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  ci-pipeline:
+    runs-on: ubuntu-latest
+
+    env:
+      DOCKER_IMAGE: braianramos/frontcripto
+      TAG_FILE: version.txt
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Determine version
+        run: |
+          LATEST_VERSION=$(curl -s "https://hub.docker.com/v2/repositories/${{ env.DOCKER_IMAGE }}/tags/?page_size=100" | 
+            jq -r '.results[].name' | 
+            grep -E '^[0-9]+\.[0-9]+\.[0-9]+$' | 
+            sort -V | 
+            tail -n 1 || echo "0.0.0")
+          echo "Latest version: $LATEST_VERSION"
+          MAJOR=$(echo $LATEST_VERSION | cut -d. -f1)
+          MINOR=$(echo $LATEST_VERSION | cut -d. -f2)
+          PATCH=$(echo $LATEST_VERSION | cut -d. -f3)
+          NEW_VERSION="${MAJOR}.${MINOR}.$((PATCH + 1))"
+          echo "New version: $NEW_VERSION"
+          echo $NEW_VERSION > ${{ env.TAG_FILE }}
+          cat ${{ env.TAG_FILE }}
+        shell: bash
+
+      - name: Run tests
+        uses: actions/setup-node@v3
+        with:
+          node-version: '14'
+        run: |
+          npm install
+          npm test
+
+      - name: Build Docker image
+        run: |
+          NEW_VERSION=$(cat ${{ env.TAG_FILE }})
+          docker build -t ${{ env.DOCKER_IMAGE }}:$NEW_VERSION -t ${{ env.DOCKER_IMAGE }}:latest .
+          docker save ${{ env.DOCKER_IMAGE }}:$NEW_VERSION ${{ env.DOCKER_IMAGE }}:latest > image.tar
+        env:
+          DOCKER_BUILDKIT: 1
+
+      - name: Push Docker image
+        run: |
+          echo "${{ secrets.DOCKERHUB_PASSWORD }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
+          NEW_VERSION=$(cat ${{ env.TAG_FILE }})
+          docker load < image.tar
+          docker push ${{ env.DOCKER_IMAGE }}:$NEW_VERSION
+          docker push ${{ env.DOCKER_IMAGE }}:latest
+          docker logout
