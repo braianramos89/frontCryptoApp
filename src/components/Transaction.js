@@ -35,8 +35,8 @@ const Transaction = () => {
         try {
             setLoading(true);
             const endpoint = isAdmin
-                ? `http://localhost:8081/api/v1/cryptos/transactions`
-                : `http://localhost:8081/api/v1/cryptos/transactionsId?userId=${userId}`;
+                ? `http://cryptoapp:8081/api/v1/cryptos/transactions`
+                : `http://cryptoapp:8081/api/v1/cryptos/transactionsId?userId=${userId}`;
 
             const response = await fetch(endpoint, {
                 method: 'GET',
@@ -81,8 +81,8 @@ const Transaction = () => {
 
     const fetchAverageSales = async () => {
         const endpoint = isAdmin
-            ? `http://localhost:8081/api/v1/cryptos/transactions/average/sales`
-            : `http://localhost:8081/api/v1/cryptos/transactions/average/salesId?userId=${userId}`;
+            ? `http://cryptoapp:8081/api/v1/cryptos/transactions/average/sales`
+            : `http://cryptoapp:8081/api/v1/cryptos/transactions/average/salesId?userId=${userId}`;
         try {
             const response = await fetch(endpoint, {
                 headers: { 'Authorization': `Bearer ${keycloak.token}` }
@@ -96,8 +96,8 @@ const Transaction = () => {
 
     const fetchAveragePurchases = async () => {
         const endpoint = isAdmin
-            ? `http://localhost:8081/api/v1/cryptos/transactions/average/sells`
-            : `http://localhost:8081/api/v1/cryptos/transactions/average/sellsId?userId=${userId}`;
+            ? `http://cryptoapp:8081/api/v1/cryptos/transactions/average/sells`
+            : `http://cryptoapp:8081/api/v1/cryptos/transactions/average/sellsId?userId=${userId}`;
         try {
             const response = await fetch(endpoint, {
                 headers: { 'Authorization': `Bearer ${keycloak.token}` }

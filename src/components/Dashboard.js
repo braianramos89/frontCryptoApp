@@ -13,7 +13,7 @@ function Dashboard() {
     useEffect(() => {
         const obtenerDatos = async () => {
             try {
-                const response = await fetchWithAuth('http://localhost:8081/api/v1/cryptos/fetch');
+                const response = await fetchWithAuth('http://cryptoapp:8081/api/v1/cryptos/fetch');
                 const responseData = await response.json();
                 setData(responseData);
             } catch (error) {
