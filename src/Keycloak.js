@@ -2,7 +2,7 @@
 import Keycloak from 'keycloak-js';
 
 const keycloak = new Keycloak({
-            url: 'http://keycloak:8080', // Base URL de Keycloak sin '/auth'
+            url: 'https://criptoapp.duckdns.org/auth', // Base URL de Keycloak sin '/auth'
             realm: 'cryptoapp', // Tu realm
             clientId: 'front-cryptoapp', // Tu clientId
 });
