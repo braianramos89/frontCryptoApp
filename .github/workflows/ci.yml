@@ -33,6 +33,12 @@ jobs:
           echo $NEW_VERSION > ${{ env.TAG_FILE }}
         shell: bash
 
+      - name: Upload version artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: version
+          path: ${{ env.TAG_FILE }}
+
       - name: Build Docker image
         run: |
           docker builder prune -f  # Limpia caché antes de construir
@@ -57,9 +63,13 @@ jobs:
 
     env:
       DOCKER_IMAGE: braianramos/frontcripto
-      TAG_FILE: version.txt
 
     steps:
+      - name: Download version artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: version
+
       - name: Create SSH Key File
         run: |
           echo "${{ secrets.SSH_KEY }}" > /tmp/deploy_key.pem
@@ -67,7 +77,7 @@ jobs:
 
       - name: Deploy Frontend
         run: |
-          NEW_VERSION=$(cat ${{ env.TAG_FILE }})
+          NEW_VERSION=$(cat version.txt)
           ssh -i /tmp/deploy_key.pem -o StrictHostKeyChecking=no criptoapp@13.64.236.240 "
           cd /home/criptoapp &&
           sed -i \"s|image: *braianramos/frontcripto:.*|image: braianramos/frontcripto:$NEW_VERSION|g\" docker-compose.yml &&
