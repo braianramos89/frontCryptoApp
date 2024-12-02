@@ -31,20 +31,13 @@ jobs:
           NEW_VERSION="${MAJOR}.${MINOR}.$((PATCH + 1))"
           echo "New version: $NEW_VERSION"
           echo $NEW_VERSION > ${{ env.TAG_FILE }}
-          cat ${{ env.TAG_FILE }}
         shell: bash
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '14'
-
-
 
       - name: Build Docker image
         run: |
+          docker builder prune -f  # Limpia caché antes de construir
           NEW_VERSION=$(cat ${{ env.TAG_FILE }})
-          docker build -t ${{ env.DOCKER_IMAGE }}:$NEW_VERSION -t ${{ env.DOCKER_IMAGE }}:latest .
+          docker build --no-cache -t ${{ env.DOCKER_IMAGE }}:$NEW_VERSION -t ${{ env.DOCKER_IMAGE }}:latest .
           docker save ${{ env.DOCKER_IMAGE }}:$NEW_VERSION ${{ env.DOCKER_IMAGE }}:latest > image.tar
         env:
           DOCKER_BUILDKIT: 1
@@ -57,3 +50,28 @@ jobs:
           docker push ${{ env.DOCKER_IMAGE }}:$NEW_VERSION
           docker push ${{ env.DOCKER_IMAGE }}:latest
           docker logout
+
+  deploy:
+    needs: ci-pipeline
+    runs-on: ubuntu-latest
+
+    env:
+      DOCKER_IMAGE: braianramos/frontcripto
+      TAG_FILE: version.txt
+
+    steps:
+      - name: Create SSH Key File
+        run: |
+          echo "${{ secrets.SSH_KEY }}" > /tmp/deploy_key.pem
+          chmod 600 /tmp/deploy_key.pem  # Asegura permisos adecuados para la clave
+
+      - name: Deploy Frontend
+        run: |
+          NEW_VERSION=$(cat ${{ env.TAG_FILE }})
+          ssh -i /tmp/deploy_key.pem -o StrictHostKeyChecking=no criptoapp@13.64.236.240 "
+          cd /home/criptoapp &&
+          sed -i \"s|image: *braianramos/frontcripto:.*|image: braianramos/frontcripto:$NEW_VERSION|g\" docker-compose.yml &&
+          docker compose up -d frontcripto
+          "
+      - name: Clean up SSH Key
+        run: rm -f /tmp/deploy_key.pem
