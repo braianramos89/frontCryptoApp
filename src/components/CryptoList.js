@@ -31,7 +31,7 @@ const CryptoList = ({ searchTerm, onSelectCrypto }) => {
             }
 
             try {
-                const response = await fetch('http://localhost:8081/api/v1/cryptos/market-coins?vsCurrency=usd', {
+                const response = await fetch('/api/v1/cryptos/market-coins?vsCurrency=usd', {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json',
@@ -82,7 +82,7 @@ const CryptoList = ({ searchTerm, onSelectCrypto }) => {
             const startDateFormatted = startDate.toISOString().split('T')[0];
             const endDateFormatted = endDate.toISOString().split('T')[0];
 
-            fetch(`http://localhost:8081/api/v1/cryptos/market/evaluate?cryptoId=${cryptoId}&shortPeriod=7&longPeriod=21&startDate=${startDateFormatted}&endDate=${endDateFormatted}`, {
+            fetch(`/api/v1/cryptos/market/evaluate?cryptoId=${cryptoId}&shortPeriod=7&longPeriod=21&startDate=${startDateFormatted}&endDate=${endDateFormatted}`, {
                 method: 'GET',
                 headers: {
                     'Authorization': `Bearer ${keycloak.token}`,

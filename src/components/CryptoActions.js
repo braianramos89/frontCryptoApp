@@ -13,7 +13,7 @@ const CryptoActions = ({ crypto, onBuy, onSell }) => {
     // Función para obtener el balance en USD
     const fetchUsdBalance = async () => {
         try {
-            const response = await fetch('http://cryptoapp:8081/api/v1/balance/current/usd', {
+            const response = await fetch('/api/v1/balance/current/usd', {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
@@ -36,7 +36,7 @@ const CryptoActions = ({ crypto, onBuy, onSell }) => {
     // Función para obtener el balance de la criptomoneda seleccionada
     const fetchCryptoBalance = async () => {
         try {
-            const response = await fetch(`http://cryptoapp:8081/api/v1/balance/current/${crypto?.id}`, {
+            const response = await fetch(`/api/v1/balance/current/${crypto?.id}`, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
@@ -76,7 +76,7 @@ const CryptoActions = ({ crypto, onBuy, onSell }) => {
             }
 
             await keycloak.updateToken(5); // Actualiza el token antes de la petición
-            const response = await fetch('http://cryptoapp:8081/api/v1/balance/credit', {
+            const response = await fetch('/api/v1/balance/credit', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

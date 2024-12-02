@@ -22,7 +22,7 @@ const Home = () => {
             const fetchCryptos = async () => {
                 try {
                     await keycloak.updateToken(5);
-                    const response = await fetch('http://cryptoapp:8081/api/v1/cryptos', {
+                    const response = await fetch('/api/v1/cryptos', {
                         method: 'GET',
                         headers: {
                             'Content-Type': 'application/json',
@@ -66,7 +66,7 @@ const Home = () => {
     // Función para manejar la compra de una criptomoneda con cantidad específica
     const handleBuy = async (crypto, amount) => {
         try {
-            const response = await fetch('http://cryptoapp:8081/api/v1/cryptos/buy', {
+            const response = await fetch('/api/v1/cryptos/buy', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -100,7 +100,7 @@ const Home = () => {
     // Función para manejar la venta de una criptomoneda con cantidad específica
     const handleSell = async (crypto, amount) => {
         try {
-            const response = await fetch('http://cryptoapp:8081/api/v1/cryptos/sell', {
+            const response = await fetch('/api/v1/cryptos/sell', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

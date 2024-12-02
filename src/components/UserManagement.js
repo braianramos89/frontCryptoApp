@@ -18,7 +18,7 @@ const UserManagement = () => {
 
     const fetchUsers = async () => {
         try {
-            const response = await fetch('http://cryptoapp:8081/api/v1/keycloak/users', {
+            const response = await fetch('/api/v1/keycloak/users', {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
@@ -93,7 +93,7 @@ const UserManagement = () => {
 
     const handleCreateUser = async () => {
         try {
-            const response = await fetch('http://cryptoapp:8081/api/v1/keycloak/users', {
+            const response = await fetch('/api/v1/keycloak/users', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -117,7 +117,7 @@ const UserManagement = () => {
 
     const handleEditUser = async () => {
         try {
-            const response = await fetch(`http://cryptoapp:8081/api/v1/keycloak/users/${editingUser.id}`, {
+            const response = await fetch(`/api/v1/keycloak/users/${editingUser.id}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -145,7 +145,7 @@ const UserManagement = () => {
         if (!confirmDelete) return;
 
         try {
-            const response = await fetch(`http://cryptoapp:8081/api/v1/keycloak/users/${userId}`, {
+            const response = await fetch(`/api/v1/keycloak/users/${userId}`, {
                 method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json',

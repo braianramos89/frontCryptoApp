@@ -3,7 +3,7 @@ import keycloak from '../Keycloak';
 
 
 const api = axios.create({
-    baseURL: 'http://cryptoapp:8081', // URL de tu backend en Spring Boot
+    baseURL: '/api', // URL de tu backend en Spring Boot
 });
 
 api.interceptors.request.use(
